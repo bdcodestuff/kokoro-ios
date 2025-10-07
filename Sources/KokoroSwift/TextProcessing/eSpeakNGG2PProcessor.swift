@@ -20,6 +20,14 @@ class eSpeakNGG2PProcessor : G2PProcessor {
     guard let eSpeakEngine else { throw G2PProcessorError.processorNotInitialized }
     return try eSpeakEngine.phonemize(text: input)
   }
+
+  #if canImport(MisakiSwift)
+  func processWithTokens(input: String) throws -> (phonemes: String, tokens: [MisakiSwift.MToken]) {
+    // eSpeakNG doesn't support token-level information, so return empty tokens array
+    let phonemes = try process(input: input)
+    return (phonemes: phonemes, tokens: [])
+  }
+  #endif
 }
 
 #endif

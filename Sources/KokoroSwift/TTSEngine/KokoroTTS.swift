@@ -92,7 +92,23 @@ public class KokoroTTS {
     g2pProcessor = try? G2PFactory.createG2PProcessor(engine: g2p)
   }
 
-  public func generateAudio(voice: TTSVoice, language: Language, text: String, speed: Float = 1.0) throws -> [Float] {
+  /// Result of audio generation
+  public struct GenerationResult {
+    public let audio: [Float]
+    #if canImport(MisakiSwift)
+    public let tokens: [MisakiSwift.MToken]?
+    #endif
+  }
+
+  /// Generates audio from text, optionally including word-level timestamps
+  /// - Parameters:
+  ///   - voice: The TTS voice to use
+  ///   - language: The language for G2P processing
+  ///   - text: The input text to synthesize
+  ///   - speed: Speech speed multiplier (default: 1.0)
+  ///   - includeTimestamps: Whether to calculate word-level timestamps (default: false, requires MisakiSwift)
+  /// - Returns: GenerationResult containing audio and optional tokens with timestamps
+  public func generateAudio(voice: TTSVoice, language: Language, text: String, speed: Float = 1.0, includeTimestamps: Bool = false) throws -> GenerationResult {
     if chosenVoice != voice {
       self.voice = VoiceLoader.loadVoice(voice)
       guard let g2pProcessor else {
@@ -106,9 +122,25 @@ public class KokoroTTS {
     BenchmarkTimer.reset()
     BenchmarkTimer.startTimer(Constants.bm_TTS)
 
+    #if canImport(MisakiSwift)
+    var tokens: [MisakiSwift.MToken]? = nil
+    let outputStr: String
+
+    if includeTimestamps, let processor = g2pProcessor {
+      let result = try processor.processWithTokens(input: text)
+      outputStr = result.phonemes
+      tokens = result.tokens
+    } else {
+      guard let output = try g2pProcessor?.process(input: text) else {
+        throw G2PProcessorError.processorNotInitialized
+      }
+      outputStr = output
+    }
+    #else
     guard let outputStr = try g2pProcessor?.process(input: text) else {
       throw G2PProcessorError.processorNotInitialized
     }
+    #endif
 
     let inputIds = Tokenizer.tokenize(phonemizedText: outputStr)
     guard inputIds.count <= Constants.maxTokenCount else {
@@ -159,9 +191,23 @@ public class KokoroTTS {
     let asr = MLX.matmul(tEn, predAlnTrg)
     let audio = decoder(asr: asr, F0Curve: F0Pred, N: NPred, s: refS[0 ... 1, 0 ... 127])[0]
     
+    #if canImport(MisakiSwift)
+    // Calculate word-level timestamps if tokens are available
+    if let tokens = tokens {
+      let predDurArray: [Int] = predDur.asArray(Int32.self).map { Int($0) }
+      MisakiSwift.EnglishG2P.joinTimestamps(tokens: tokens, predDur: predDurArray)
+    }
+    #endif
+
     BenchmarkTimer.stopTimer(Constants.bm_TTS)
 
-    return audio[0].asArray(Float.self)
+    let audioArray = audio[0].asArray(Float.self)
+
+    #if canImport(MisakiSwift)
+    return GenerationResult(audio: audioArray, tokens: tokens)
+    #else
+    return GenerationResult(audio: audioArray)
+    #endif
   }
 
   public struct Constants {

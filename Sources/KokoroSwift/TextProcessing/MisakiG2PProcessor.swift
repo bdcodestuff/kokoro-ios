@@ -21,6 +21,12 @@ class MisakiG2PProcessor : G2PProcessor {
     guard let misaki else { throw G2PProcessorError.processorNotInitialized }
     return misaki.phonemize(text: input).0
   }
+
+  func processWithTokens(input: String) throws -> (phonemes: String, tokens: [MisakiSwift.MToken]) {
+    guard let misaki else { throw G2PProcessorError.processorNotInitialized }
+    let result = misaki.phonemize(text: input)
+    return (phonemes: result.0, tokens: result.1)
+  }
 }
 
 #endif
