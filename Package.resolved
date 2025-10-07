@@ -1,0 +1,33 @@
+{
+  "originHash" : "675bdd7545465d9b7af1b9fb7626fe7d17f0daf69a6771e59ac1e0bb9d935872",
+  "pins" : [
+    {
+      "identity" : "misakiswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/bdcodestuff/MisakiSwift",
+      "state" : {
+        "revision" : "9d15ceebde744142e481dfdaa6d12dffd490ac37",
+        "version" : "1.0.2"
+      }
+    },
+    {
+      "identity" : "mlx-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ml-explore/mlx-swift",
+      "state" : {
+        "revision" : "96c0f69cf15f38abd6248bb71fca908171dab1d8",
+        "version" : "0.25.6"
+      }
+    },
+    {
+      "identity" : "swift-numerics",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-numerics",
+      "state" : {
+        "revision" : "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+        "version" : "1.1.1"
+      }
+    }
+  ],
+  "version" : 3
+}

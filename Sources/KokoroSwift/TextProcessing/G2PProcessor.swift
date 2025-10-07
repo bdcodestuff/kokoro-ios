@@ -1,3 +1,5 @@
+import MisakiSwift
+
 enum G2PProcessorError : Error {
   case processorNotInitialized
   case unsupportedLanguage

@@ -2,6 +2,7 @@
 
 import Foundation
 import eSpeakNGLib
+import MisakiSwift
 
 class eSpeakNGG2PProcessor : G2PProcessor {
   private var eSpeakEngine: eSpeakNG?

@@ -4,6 +4,7 @@
 import Foundation
 import MLX
 import MLXNN
+import MisakiSwift
 
 // Available voices
 public enum TTSVoice {
